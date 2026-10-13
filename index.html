@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Study Library</title>
+<script src="pdf.min.js"></script>
+<style>
+:root{--bg:#f6f5f2;--fg:#1d1d1f;--card:#fff;--mut:#6b6b70;--ac:#2f5bd8;--bd:#dcdad4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--fg:#ececee;--card:#222427;--mut:#9a9aa2;--ac:#7c9cff;--bd:#33353a}}
+:root[data-theme="dark"]{--bg:#17181a;--fg:#ececee;--card:#222427;--mut:#9a9aa2;--ac:#7c9cff;--bd:#33353a}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px 11px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px 9px}
+#app{display:flex;flex-direction:column;height:100%}
+nav{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--bd);overflow-x:auto;align-items:center}
+nav b{margin-right:8px}nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{flex:1;overflow:auto;padding:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.card img{width:100%;height:150px;object-fit:cover;object-position:top;border-radius:8px;background:var(--bd)}
+.badge{font-size:11px;padding:1px 7px;border-radius:99px;background:var(--bd);margin-right:3px}
+.bar{height:5px;background:var(--bd);border-radius:9px}.bar i{display:block;height:100%;background:var(--ac);border-radius:9px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.mut{color:var(--mut);font-size:13px}
+.drop{border:2px dashed var(--bd);border-radius:12px;padding:16px;text-align:center;margin-bottom:14px}
+#reader{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:5;padding-top:env(safe-area-inset-top,0px)}
+#reader.on{display:flex}
+.tb{display:flex;gap:6px;padding:7px 10px;border-bottom:1px solid var(--bd);flex-wrap:wrap;align-items:center}
+.warn{background:#fff3cd;color:#5c4400;padding:7px 12px;font-size:13px;border-bottom:1px solid #e8d48a}
+#body{flex:1;display:flex;min-height:0}
+#view{flex:1;overflow:auto;position:relative}
+#side{width:290px;border-left:1px solid var(--bd);overflow:auto;padding:10px;display:none}#side.on{display:block}
+@media(max-width:700px){#side{position:absolute;right:0;top:0;bottom:0;background:var(--bg);z-index:3;width:85%}#body{position:relative}}
+#orig{display:flex;justify-content:center;padding:12px}canvas{max-width:100%;box-shadow:0 2px 12px #0003;background:#fff}
+#reflow{--fs:19px;--lh:1.7;--w:680px;--font:Georgia,serif;--al:left;--rb:#fff;--rf:#222;background:var(--rb);color:var(--rf);min-height:100%;padding:24px 16px}
+#reflow .in{max-width:var(--w);margin:auto;font:var(--fs)/var(--lh) var(--font);text-align:var(--al)}
+#reflow p{margin:0 0 .9em}#reflow h3{margin:1.4em 0 .5em;line-height:1.3}
+#reflow .pg{font:12px system-ui;opacity:.55;margin:1em 0 .3em;border-top:1px solid #8883;padding-top:4px}
+#reflow .pg button{padding:0 6px;font-size:11px;margin-left:6px}
+#reflow .b{content-visibility:auto;contain-intrinsic-size:auto 80px}
+mark{border-radius:3px;color:inherit;padding:0 1px}
+#fl{position:fixed;display:none;gap:5px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:5px;z-index:9;box-shadow:0 4px 14px #0004}
+.dot{width:22px;height:22px;border-radius:50%;padding:0;border:2px solid #fff}
+dialog{border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--fg);max-width:420px;width:92%}
+dialog::backdrop{background:#0006}textarea{width:100%;min-height:90px}
+.note{border-left:4px solid var(--ac);background:var(--card);padding:6px 9px;margin:8px 0;border-radius:6px;cursor:pointer}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;display:none;z-index:20}
+details.ty{position:relative}details.ty>div{position:absolute;z-index:6;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;width:240px;display:grid;gap:7px}
+#app{flex-direction:column-reverse}
+nav{border-top:1px solid var(--bd);border-bottom:0;justify-content:space-around;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:var(--card)}
+nav b{display:none}nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:7px 2px;font-size:12px;line-height:1.25;white-space:nowrap}
+nav button.on{background:var(--ac);color:#fff}button{min-height:40px}.card{box-shadow:0 1px 3px #0001}
+.grid{grid-template-columns:repeat(2,1fr)}@media(min-width:700px){.grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}}
+</style></head><body>
+<div id="app">
+<nav><b>📚 Study Library</b><button data-v="lib" class="on">📚<br>Library</button><button data-v="notes">📝<br>Notes</button><button data-v="search">🔍<br>Search</button><button data-v="set">⚙️<br>Settings</button></nav>
+<main id="main"></main></div>
+
+<div id="reader">
+ <div class="tb"><button id="rBack">← Library</button><b id="rTitle" style="max-width:30vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></b>
+  <button id="mOrig" class="p">Original</button><button id="mRef">Reflow</button>
+  <span id="pgc" class="row"><button id="prev">‹</button><input id="pgn" type="number" min="1" style="width:62px"><span id="pgt" class="mut"></span><button id="next">›</button><button id="zo">−</button><button id="zi">+</button></span>
+  <details class="ty" id="ty"><summary style="cursor:pointer;list-style:none"><button as="x">Aa</button></summary><div>
+   <label>Size <input type="range" id="tFs" min="14" max="34"></label>
+   <label>Line spacing <input type="range" id="tLh" min="12" max="24"></label>
+   <label>Width <input type="range" id="tW" min="360" max="1000" step="20"></label>
+   <select id="tFont"><option value="Georgia,serif">Serif</option><option value="system-ui,sans-serif">Sans</option><option value="ui-monospace,monospace">Mono</option><option value="'Atkinson Hyperlegible',Verdana,sans-serif">High legibility</option></select>
+   <select id="tAl"><option value="left">Left</option><option value="justify">Justify</option></select>
+   <select id="tTh"><option value="light">Light</option><option value="sepia">Sepia</option><option value="dark">Dark</option></select></div></details>
+  <button id="bm">🔖 Bookmark</button><button id="pn">+ Page note</button><button id="sd">Notes</button></div>
+ <div id="banner"></div>
+ <div id="body"><div id="view"></div><div id="side"></div></div>
+</div>
+<div id="fl"></div><div id="toast"></div>
+<dialog id="dlg"><form method="dialog" id="dform"><h3 id="dT" style="margin-top:0"></h3><div id="dB"></div><div class="row" style="margin-top:10px;justify-content:flex-end"><button value="x" type="button" id="dX">Cancel</button><button class="p" value="ok" id="dOK">OK</button></div></form></dialog>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const COL={'#fde047':'Important','#7dd3fc':'Definition','#86efac':'Exam point','#fca5a5':'Doubt / revisit','#d8b4fe':'Example / formula'};
+const uid=()=>Math.random().toString(36).slice(2,10);
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
+/* ---------- storage: IndexedDB with in-memory fallback ---------- */
+const mem={docs:new Map(),blobs:new Map(),notes:new Map(),text:new Map()};
+const dbp=new Promise(r=>{try{const q=indexedDB.open('studylib',1);q.onupgradeneeded=()=>['docs','blobs','notes','text'].forEach(s=>q.result.createObjectStore(s,{keyPath:'id'}));q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+async function tx(s,mode,f){const d=await dbp;if(!d)return f(null,mem[s]);return new Promise((res,rej)=>{const t=d.transaction(s,mode),o=t.objectStore(s),q=f(o);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})}
+const DB={get:(s,id)=>tx(s,'readonly',(o,m)=>m?m.get(id):o.get(id)),put:(s,v)=>tx(s,'readwrite',(o,m)=>m?m.set(v.id,v):o.put(v)),del:(s,id)=>tx(s,'readwrite',(o,m)=>m?m.delete(id):o.delete(id)),all:(s)=>tx(s,'readonly',(o,m)=>m?{result:[...m.values()]}:o.getAll())};
+const G=()=>JSON.parse(localStorage.getItem('g')||'{}');const setG=o=>{try{localStorage.setItem('g',JSON.stringify({...G(),...o}))}catch(e){}};
+const PREF0={fs:19,lh:17,w:680,font:'Georgia,serif',al:'left',th:'light'};
+/* ---------- dialogs ---------- */
+function ask(title,html,okLabel='OK'){return new Promise(r=>{const d=$('#dlg');$('#dT').textContent=title;$('#dB').innerHTML=html;$('#dOK').textContent=okLabel;
+ $('#dX').onclick=()=>{d.close();r(null)};d.onclose=()=>{};$('#dform').onsubmit=e=>{e.preventDefault();const v=d.querySelector('#dv');d.close();r(v?v.value:true)};d.showModal();const v=d.querySelector('#dv');v&&v.focus()})}
+const askText=(t,init='')=>ask(t,`<textarea id="dv">${esc(init)}</textarea>`,'Save');
+/* ---------- import ---------- */
+async function sha(buf){const h=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,32)}
+async function importFile(f){
+ const buf=await f.arrayBuffer();if(new TextDecoder().decode(new Uint8Array(buf,0,Math.min(1024,buf.byteLength))).indexOf('%PDF')<0)return toast(f.name+': not a PDF');
+ const id=await sha(buf);
+ if(await DB.get('docs',id))return toast('Already in library: '+f.name+' (duplicate detected by file hash)');
+ const d={id,title:f.name.replace(/\.pdf$/i,''),size:f.size,added:Date.now(),opened:0,pages:0,pos:1,secs:0,enc:false,prefs:null};
+ await DB.put('blobs',{id,buf});
+ try{const t=pdfjsLib.getDocument({data:buf.slice(0)});t.onPassword=()=>{d.enc=true;t.destroy()};const pdf=await t.promise;d.pages=pdf.numPages;
+  const m=await pdf.getMetadata().catch(()=>null);if(m&&m.info&&m.info.Title)d.title=m.info.Title;if(m&&m.info&&m.info.Author)d.author=m.info.Author;
+  const pg=await pdf.getPage(1),vp=pg.getViewport({scale:.4}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;d.thumb=c.toDataURL('image/jpeg',.6);
+  const perms=await pdf.getPermissions();d.restricted=perms!==null&&!(perms.includes(16)&&perms.includes(8));pdf.destroy()}
+ catch(e){if(!d.enc)d.err=String(e.message||e)}
+ await DB.put('docs',d);toast('Imported: '+d.title)}
+/* ---------- views ---------- */
+let view='lib';
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));render()});
+async function render(){const m=$('#main');({lib:rLib,notes:rNotes,search:rSearch,set:rSet})[view](m)}
+async function rLib(m){
+ const docs=(await DB.all('docs')).sort((a,b)=>b.opened-a.opened||b.added-a.added),notes=await DB.all('notes');
+ const last=docs.find(d=>d.opened);
+ m.innerHTML=`<div class="drop" id="drop"><b>Import PDFs</b> — drop files here or <div style="margin-top:8px"><input type="file" id="fi" multiple style="width:100%;max-width:360px;padding:12px;font-size:16px"></div><div class="mut" id="fdbg">Tap the box above and pick a PDF from your phone.</div>
+ <div class="mut" style="margin-top:6px">Files stay on this device (IndexedDB). Originals are never modified.</div></div>
+ <div class="row mut" style="margin-bottom:12px">${docs.length} books · ${notes.length} notes/highlights/bookmarks · ${Math.round(docs.reduce((a,d)=>a+d.secs,0)/60)} min read</div>
+ ${last?`<div class="card" style="margin-bottom:14px"><b>Continue reading</b><div>${esc(last.title)} — page ${last.pos}${last.pages?' of '+last.pages:''}</div><div><button class="p" data-o="${last.id}">Resume</button></div></div>`:''}
+ <div class="grid">${docs.map(d=>`<div class="card">${d.thumb?`<img src="${d.thumb}">`:`<img alt="" style="display:flex">`}
+ <b>${esc(d.title)}</b><div class="mut">${esc(d.author||'')} ${d.pages?d.pages+' pages':''}</div>
+ <div>${d.enc?'<span class="badge">🔒 password</span>':''}${d.restricted?'<span class="badge">⚠ restricted</span>':''}${d.scanned?'<span class="badge">scanned</span>':''}</div>
+ <div class="bar"><i style="width:${d.pages?Math.round(d.pos/d.pages*100):0}%"></i></div>
+ <div class="row"><button class="p" data-o="${d.id}">Open</button><button data-x="${d.id}">Delete</button></div></div>`).join('')||'<p class="mut">No books yet. Import a PDF to start.</p>'}</div>`;
+ $('#fi').onclick=()=>{$('#fdbg').textContent='Opening file chooser…'};$('#fi').onchange=async e=>{const fs=[...e.target.files];$('#fdbg').textContent='Selected '+fs.length+' file(s), importing…';for(const f of fs){try{await importFile(f)}catch(err){toast('Import failed: '+(err.message||err))}}rLib(m)};
+ const dp=$('#drop');dp.ondragover=e=>{e.preventDefault()};dp.ondrop=async e=>{e.preventDefault();for(const f of e.dataTransfer.files)await importFile(f);rLib(m)};
+ m.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>openDoc(b.dataset.o));
+ m.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(await ask('Delete book?','<p>This removes the PDF, its cached text and its notes from this device.</p>','Delete')){const id=b.dataset.x;await DB.del('docs',id);await DB.del('blobs',id);await DB.del('text',id);for(const n of await DB.all('notes'))if(n.doc===id)await DB.del('notes',n.id);rLib(m)}})}
+async function rNotes(m){
+ const [notes,docs]=await Promise.all([DB.all('notes'),DB.all('docs')]),dn=Object.fromEntries(docs.map(d=>[d.id,d]));
+ m.innerHTML=`<div class="row" style="margin-bottom:10px"><b>All notes</b><select id="fc"><option value="">All types</option><option value="bm">Bookmarks</option><option value="pn">Page notes</option>${Object.entries(COL).map(([c,l])=>`<option value="${c}">${l}</option>`).join('')}</select><button id="ex">Export Markdown</button></div><div id="nl"></div>`;
+ const show=()=>{const f=$('#fc').value;$('#nl').innerHTML=notes.filter(n=>!f||n.type===f||n.color===f).sort((a,b)=>b.t-a.t).map(n=>nHTML(n,dn[n.doc])).join('')||'<p class="mut">Nothing yet.</p>';bindNotes($('#nl'))};
+ $('#fc').onchange=show;show();
+ $('#ex').onclick=()=>{let md='# My study notes\n\n';for(const d of docs){const ns=notes.filter(n=>n.doc===d.id).sort((a,b)=>a.page-b.page);if(!ns.length)continue;md+=`## ${d.title}\n\n`;ns.forEach(n=>md+=`- p.${n.page} [${n.type==='hl'?COL[n.color]||'highlight':n.type==='bm'?'bookmark':'note'}]${n.text?' > '+n.text:''}${n.comment?' — '+n.comment:''}\n`);md+='\n'}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download='study-notes.md';a.click()}}
+function nHTML(n,d){const lab=n.type==='bm'?'🔖 Bookmark':n.type==='pn'?'📝 Page note':(COL[n.color]||'Highlight');
+ return `<div class="note" data-n="${n.id}" data-d="${n.doc}" data-p="${n.page}" style="border-color:${n.color||'var(--ac)'}"><div class="mut">${esc(d?d.title:'')} · p.${n.page} · ${lab}</div>${n.text?`<div>“${esc(n.text.slice(0,300))}”</div>`:''}${n.comment?`<div><i>${esc(n.comment)}</i></div>`:''}<button data-del="${n.id}" style="font-size:11px;padding:1px 6px">delete</button></div>`}
+function bindNotes(root,inReader){root.querySelectorAll('.note').forEach(e=>e.onclick=ev=>{if(ev.target.dataset.del)return;inReader&&R.doc.id===e.dataset.d?goPage(+e.dataset.p):openDoc(e.dataset.d,+e.dataset.p)});
+ root.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await DB.del('notes',b.dataset.del);inReader?(sideRender(),R.mode==='reflow'&&drawReflow()):view==='notes'?rNotes($('#main')):0})}
+function rSearch(m){
+ m.innerHTML=`<input id="q" placeholder="Search notes and cached book text…" style="width:100%;max-width:520px"><div class="mut" style="margin:6px 0">Exact phrase search, fully offline. Book text is searchable after you build its reading text (Reflow). Semantic search is not in v1.</div><div id="sr"></div>`;
+ $('#q').oninput=async e=>{const q=e.target.value.trim().toLowerCase();if(q.length<2)return $('#sr').innerHTML='';
+  const [notes,docs,texts]=await Promise.all([DB.all('notes'),DB.all('docs'),DB.all('text')]),dn=Object.fromEntries(docs.map(d=>[d.id,d]));let h='';
+  notes.filter(n=>((n.text||'')+' '+(n.comment||'')).toLowerCase().includes(q)).forEach(n=>h+=nHTML(n,dn[n.doc]));
+  let c=0;for(const t of texts){for(const b of t.blocks){const i=b.text.toLowerCase().indexOf(q);if(i>=0&&c++<60)h+=`<div class="note" data-d="${t.id}" data-p="${b.p}"><div class="mut">${esc(dn[t.id]?.title||'')} · p.${b.p} · ${b.ocr?'recognized (OCR) text':'book text'}</div>${esc(b.text.slice(Math.max(0,i-60),i+120))}</div>`}}
+  $('#sr').innerHTML=h||'<p class="mut">No matches.</p>';bindNotes($('#sr'))}}
+async function rSet(m){
+ const g=G();m.innerHTML=`<h3>Privacy &amp; caches</h3>
+ <label class="row"><input type="checkbox" id="pe" ${g.persist===false?'':'checked'}> Keep extracted text on this device after closing a book (needed for offline search)</label>
+ <div class="mut">Turning this off deletes extracted text when you close the book; you may need to re-open it (and re-enter any password) to rebuild it. Passwords are never saved or logged.</div>
+ <p><button id="cc">Clear all extracted-text caches</button></p>
+ <h3>Colour legend</h3><div>${Object.entries(COL).map(([c,l])=>`<span class="badge" style="background:${c};color:#222">${l}</span>`).join('')}</div>
+ <h3>What this v1 does</h3><ul><li>Import PDFs, duplicate detection, thumbnails, resume position</li><li>Password prompt (opening password) with retry; never stored</li><li>Detects owner-restricted PDFs and tests real text extraction</li><li>Reflow reader with typography controls, per-book settings</li><li>Highlights, notes, bookmarks anchored to page and text; Markdown export</li><li>Local search over notes and extracted text</li></ul>
+ <h3>Not in v1 (honest list)</h3><ul><li><b>OCR</b>: needs the Tesseract engine and language data, which this hosted page cannot load. Planned for the Capacitor/Android build and a bundled web build. Scanned PDFs currently open in original layout with bookmarks and notes.</li><li>Flashcards, quizzes, planner, AI assistant, sync/accounts, Android package, annotation drawing tools, continuous-scroll original view, text-to-speech</li></ul>`;
+ $('#pe').onchange=e=>setG({persist:e.target.checked});$('#cc').onclick=async()=>{for(const t of await DB.all('text'))await DB.del('text',t.id);toast('Caches cleared')}}
+/* ---------- reader ---------- */
+let R={};
+async function openDoc(id,page){
+ const d=await DB.get('docs',id),b=await DB.get('blobs',id);if(!d||!b)return toast('Book data missing');
+ R={doc:d,mode:'orig',scale:0,tries:0,t0:Date.now()};
+ const t=pdfjsLib.getDocument({data:b.buf.slice(0)});
+ t.onPassword=async(upd,reason)=>{R.tries++;if(R.tries>4){toast('Too many incorrect attempts. Please try again later.');t.destroy();return}
+  const pw=await ask('Password required',`<p>This PDF needs an <b>opening password</b> to be unlocked. The password is used only for this session and is never stored.</p>${reason===2?'<p style="color:#c33">Incorrect password, please try again.</p>':''}<input id="dv" type="password" autocomplete="off" style="width:100%">`,'Unlock');
+  if(pw===null){t.destroy();return}upd(pw)};
+ let pdf;try{pdf=await t.promise}catch(e){const n=e&&e.name;return toast(n==='PasswordException'?'Could not unlock this document.':n==='InvalidPDFException'?'This file looks corrupt or is not a valid PDF.':'Could not open this document.')}
+ R.pdf=pdf;d.pages=pdf.numPages;d.opened=Date.now();
+ const perms=await pdf.getPermissions().catch(()=>null);R.perms=perms;
+ d.enc=d.enc||false;d.restricted=perms!==null&&!(perms.includes(16)&&perms.includes(8));
+ R.noCopy=perms!==null&&!perms.includes(16);
+ R.cached=await DB.get('text',id);
+ R.extractable=R.cached?!R.cached.scanned:await probe(pdf);d.scanned=!R.extractable;
+ await DB.put('docs',d);
+ $('#rTitle').textContent=d.title;$('#reader').classList.add('on');banner();applyPrefs();
+ const p=page||d.pos||1;R.page=Math.min(p,d.pages);$('#pgn').max=d.pages;$('#pgt').textContent='/ '+d.pages;
+ $('#mRef').disabled=!R.extractable;setMode('orig');sideRender()}
+async function probe(pdf){let n=0;for(let i=1;i<=Math.min(pdf.numPages,6);i++){const tc=await(await pdf.getPage(i)).getTextContent();n+=tc.items.map(x=>x.str).join('').trim().length}return n>40}
+function banner(){const d=R.doc;let h='';
+ if(!R.extractable)h='ℹ No usable text layer was found (scanned/image-only, or extraction is blocked by this PDF). OCR is not available in this build, so reflow is disabled. Original-layout reading, bookmarks and page notes still work. Nothing was changed or unlocked.';
+ else if(d.restricted)h='⚠ This PDF has editing/copying restrictions (owner/permissions password). Reading text was tested and works, so reflow is enabled. The original file is untouched and no unrestricted copy is created or exported. Please use extracted text only as your licence allows.';
+ $('#banner').innerHTML=h?`<div class="warn">${h}</div>`:''}
+function setMode(m){R.mode=m;$('#mOrig').classList.toggle('p',m==='orig');$('#mRef').classList.toggle('p',m==='reflow');
+ $('#zo').style.display=$('#zi').style.display=m==='orig'?'':'none';$('#ty').style.display=m==='reflow'?'':'none';
+ const v=$('#view');v.scrollTop=0;if(m==='orig'){v.innerHTML='<div id="orig"><canvas id="cv"></canvas></div>';drawOrig()}else buildReflow()}
+async function drawOrig(){const pg=await R.pdf.getPage(R.page),w=$('#view').clientWidth-24;
+ const base=pg.getViewport({scale:1});if(!R.scale)R.scale=Math.min(w/base.width,2.2);
+ const vp=pg.getViewport({scale:R.scale*devicePixelRatio}),c=$('#cv');if(!c)return;c.width=vp.width;c.height=vp.height;c.style.width=vp.width/devicePixelRatio+'px';
+ R.rt&&R.rt.cancel();R.rt=pg.render({canvasContext:c.getContext('2d'),viewport:vp});try{await R.rt.promise}catch(e){}
+ $('#pgn').value=R.page;saveHere()}
+function saveHere(){R.doc.pos=R.page;DB.put('docs',R.doc)}
+function goPage(p,toOrig){p=Math.max(1,Math.min(R.doc.pages,p));R.page=p;$('#pgn').value=p;
+ if(toOrig&&R.mode!=='orig')return setMode('orig');
+ if(R.mode==='orig')drawOrig();else{const e=$('#reflow [data-pg="'+p+'"]');e&&e.scrollIntoView();saveHere()}}
+/* reflow engine: group items → lines → paragraphs/headings, mapped to pages */
+async function extractAll(pdf,onp){const blocks=[],sizes=[];const pages=[];
+ for(let i=1;i<=pdf.numPages;i++){const tc=await(await pdf.getPage(i)).getTextContent();const lines=[];let cur=null;
+  for(const it of tc.items){if(!it.str&&!it.hasEOL)continue;const y=it.transform[5],s=Math.abs(it.transform[0])||10;
+   if(cur&&Math.abs(cur.y-y)<s*.5){cur.t+=it.str;cur.s=Math.max(cur.s,s)}else{cur={y,s,t:it.str,x:it.transform[4]};lines.push(cur)}}
+  pages.push(lines);lines.forEach(l=>sizes.push(l.s));onp&&onp(i)}
+ sizes.sort((a,b)=>a-b);const med=sizes[sizes.length>>1]||10;
+ pages.forEach((lines,pi)=>{let para='',prev=null;const flush=()=>{if(para.trim())blocks.push({p:pi+1,k:'p',text:para.trim()});para=''};
+  for(const l of lines){const t=l.t.replace(/\s+/g,' ').trim();if(!t)continue;
+   if(l.s>=med*1.25&&t.length<110){flush();blocks.push({p:pi+1,k:'h',text:t});prev=null;continue}
+   const gap=prev?Math.abs(prev.y-l.y):0;if(prev&&gap>Math.max(prev.s,l.s)*1.7)flush();
+   para=/-$/.test(para)?para.slice(0,-1)+t:para+(para?' ':'')+t;prev=l}flush()});
+ return blocks}
+async function buildReflow(){const v=$('#view');let c=R.cached;
+ if(!c){v.innerHTML='<div style="padding:30px" id="prog">Building reading text…</div>';
+  const blocks=await extractAll(R.pdf,i=>{$('#prog')&&($('#prog').textContent=`Building reading text… page ${i}/${R.doc.pages}`)});
+  c={id:R.doc.id,blocks,scanned:false};R.cached=c;if(G().persist!==false)await DB.put('text',c)}
+ R.blocks=c.blocks;drawReflow();const e=$('#reflow [data-pg="'+R.page+'"]');e&&e.scrollIntoView()}
+async function drawReflow(){const notes=(await DB.all('notes')).filter(n=>n.doc===R.doc.id&&n.type==='hl');let h='',last=0;
+ for(const b of R.blocks){if(b.p!==last){last=b.p;h+=`<div class="pg" data-pg="${b.p}">Page ${b.p}<button data-orig="${b.p}">view original</button></div>`}
+  let t=esc(b.text);notes.filter(n=>n.page===b.p).forEach(n=>{const e=esc(n.text);if(e&&t.includes(e)&&!t.includes('<mark'))t=t.replace(e,`<mark style="background:${n.color}">${e}</mark>`)});
+  h+=b.k==='h'?`<h3 class="b" data-p="${b.p}">${t}</h3>`:`<p class="b" data-p="${b.p}">${t}</p>`}
+ const st=$('#view').scrollTop;$('#view').innerHTML=`<div id="reflow"><div class="in">${h}<p class="mut" style="margin-top:2em">Reflowed text can rearrange tables, equations and footnotes. Use “view original” to check the source page.</p></div></div>`;$('#view').scrollTop=st;applyPrefs();
+ $('#view').querySelectorAll('[data-orig]').forEach(b=>b.onclick=()=>goPage(+b.dataset.orig,true))}
+const TH={light:['#fff','#222'],sepia:['#f4ecd8','#4a3b26'],dark:['#16181b','#d8d8dc']};
+function prefs(){return{...PREF0,...G().defaults,...(R.doc&&R.doc.prefs)}}
+function applyPrefs(){const p=prefs(),r=$('#reflow');$('#tFs').value=p.fs;$('#tLh').value=p.lh;$('#tW').value=p.w;$('#tFont').value=p.font;$('#tAl').value=p.al;$('#tTh').value=p.th;if(!r)return;
+ r.style.setProperty('--fs',p.fs+'px');r.style.setProperty('--lh',p.lh/10);r.style.setProperty('--w',p.w+'px');r.style.setProperty('--font',p.font);r.style.setProperty('--al',p.al);r.style.setProperty('--rb',TH[p.th][0]);r.style.setProperty('--rf',TH[p.th][1])}
+[['tFs','fs',Number],['tLh','lh',Number],['tW','w',Number],['tFont','font',String],['tAl','al',String],['tTh','th',String]].forEach(([i,k,T])=>$('#'+i).oninput=e=>{R.doc.prefs={...prefs(),[k]:T(e.target.value)};DB.put('docs',R.doc);applyPrefs()});
+/* notes in reader */
+async function sideRender(){const ns=(await DB.all('notes')).filter(n=>n.doc===R.doc.id).sort((a,b)=>a.page-b.page);
+ $('#side').innerHTML=`<b>This book</b><div class="mut">${Object.entries(COL).map(([c,l])=>`<span class="badge" style="background:${c};color:#222">${l}</span>`).join('')}</div>`+(ns.map(n=>nHTML(n,R.doc)).join('')||'<p class="mut">Select text in Reflow mode to highlight, or add a bookmark/page note.</p>');bindNotes($('#side'),true)}
+async function addNote(o){await DB.put('notes',{id:uid(),doc:R.doc.id,t:Date.now(),...o});sideRender();toast('Saved')}
+$('#bm').onclick=async()=>{const c=await askText('Why does this page matter? (optional)');if(c!==null)addNote({type:'bm',page:R.page,comment:c})};
+$('#pn').onclick=async()=>{const c=await askText('Note for page '+R.page);if(c)addNote({type:'pn',page:R.page,comment:c})};
+$('#sd').onclick=()=>$('#side').classList.toggle('on');
+$('#prev').onclick=()=>goPage(R.page-1);$('#next').onclick=()=>goPage(R.page+1);$('#pgn').onchange=e=>goPage(+e.target.value);
+$('#zi').onclick=()=>{R.scale*=1.2;drawOrig()};$('#zo').onclick=()=>{R.scale/=1.2;drawOrig()};
+$('#mOrig').onclick=()=>setMode('orig');$('#mRef').onclick=()=>R.extractable&&setMode('reflow');
+document.addEventListener('keydown',e=>{if(!$('#reader').classList.contains('on')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(e.key==='ArrowRight')goPage(R.page+1);if(e.key==='ArrowLeft')goPage(R.page-1)});
+$('#rBack').onclick=async()=>{R.doc.secs+=Math.round((Date.now()-R.t0)/1000);await DB.put('docs',R.doc);if(G().persist===false)await DB.del('text',R.doc.id);R.pdf&&R.pdf.destroy();R={};$('#reader').classList.remove('on');$('#fl').style.display='none';render()};
+/* selection toolbar: highlight / note */
+const fl=$('#fl');fl.innerHTML=Object.keys(COL).map(c=>`<button class="dot" data-c="${c}" style="background:${c}" title="${COL[c]}"></button>`).join('')+'<button data-note="1">Note</button>';
+document.addEventListener('mouseup',()=>setTimeout(()=>{const s=getSelection(),t=s.toString().trim();
+ if(!R.doc||R.mode!=='reflow'||t.length<3||!$('#reflow')||!$('#reflow').contains(s.anchorNode))return fl.style.display='none';
+ const r=s.getRangeAt(0).getBoundingClientRect();fl.style.display='flex';fl.style.left=Math.max(6,Math.min(innerWidth-260,r.left))+'px';fl.style.top=Math.max(6,r.top-46)+'px'},10));
+fl.addEventListener('mousedown',e=>e.preventDefault());
+fl.onclick=async e=>{const b=e.target.closest('button');if(!b)return;const s=getSelection(),t=s.toString().trim().replace(/\s+/g,' ');const el=(s.anchorNode.nodeType===3?s.anchorNode.parentElement:s.anchorNode).closest('[data-p]');if(!el||!t)return;
+ const page=+el.dataset.p;let color=b.dataset.c,comment='';
+ if(b.dataset.note){const c=await askText('Note on selected text');if(c===null)return;comment=c;color='#fde047'}
+ await addNote({type:'hl',page,text:t,color,comment});fl.style.display='none';s.removeAllRanges();drawReflow()};
+render();
+</script></body></html>
